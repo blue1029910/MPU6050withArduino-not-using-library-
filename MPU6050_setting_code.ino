@@ -1,29 +1,26 @@
-/*
-   Arduino and MPU6050 Accelerometer and Gyroscope Sensor Tutorial
-*/
 #include <Wire.h>
 const int MPU = 0x68; // MPU6050 I2C address
-float AccX, AccY, AccZ;
-float GyroX, GyroY, GyroZ;
-float accAngleX, accAngleY, gyroAngleX, gyroAngleY, gyroAngleZ;
-float roll, pitch, yaw;
-float AccErrorX, AccErrorY, GyroErrorX, GyroErrorY, GyroErrorZ;
-float elapsedTime, currentTime, previousTime;
+float AccX, AccY, AccZ;　//三軸加速度
+float GyroX, GyroY, GyroZ; //三軸陀螺儀
+float accAngleX, accAngleY, gyroAngleX, gyroAngleY, gyroAngleZ; //三軸角度
+float roll, pitch, yaw; //三軸姿態
+float AccErrorX, AccErrorY, GyroErrorX, GyroErrorY, GyroErrorZ; //誤差
+float elapsedTime, currentTime, previousTime; //時間變數
 int c = 0;
 void setup() {
-  Serial.begin(19200);
-  Wire.begin();                      // Initialize comunication
+  Serial.begin(115200);
+  Wire.begin();                      // Initialize comunication 開始I2C通訊
   Wire.beginTransmission(MPU);       // Start communication with MPU6050 // MPU=0x68
-  Wire.write(0x6B);                  // Talk to the register 6B
-  Wire.write(0x00);                  // Make reset - place a 0 into the 6B register
-  Wire.endTransmission(true);        //end the transmission
+  Wire.write(0x6B);                  // Talk to the register 6B 開啟MPU6050配置時鐘和電源模式的寄存器
+  Wire.write(0x00);                  // Make reset - place a 0 into the 6B register 開啟MPU的CLOCK
+  Wire.endTransmission(true);        //end the transmission 
   /*
-  // Configure Accelerometer Sensitivity - Full Scale Range (default +/- 2g)
+  // Configure Accelerometer Sensitivity - Full Scale Range (default +/- 2g) 設定ACC的量測範圍
   Wire.beginTransmission(MPU);
   Wire.write(0x1C);                  //Talk to the ACCEL_CONFIG register (1C hex)
   Wire.write(0x10);                  //Set the register bits as 00010000 (+/- 8g full scale range)
   Wire.endTransmission(true);
-  // Configure Gyro Sensitivity - Full Scale Range (default +/- 250deg/s)
+  // Configure Gyro Sensitivity - Full Scale Range (default +/- 250deg/s) 設定Gyro的量測範圍
   Wire.beginTransmission(MPU);
   Wire.write(0x1B);                   // Talk to the GYRO_CONFIG register (1B hex)
   Wire.write(0x10);                   // Set the register bits as 00010000 (1000deg/s full scale)
@@ -35,9 +32,9 @@ void setup() {
   delay(20);
 }
 void loop() {
-  // === Read acceleromter data === //
+  // === Read acceleromter data === // === 讀取加速度資料 === //
   Wire.beginTransmission(MPU);
-  Wire.write(0x3B); // Start with register 0x3B (ACCEL_XOUT_H)
+  Wire.write(0x3B); // Start with register 0x3B (ACCEL_XOUT_H) 加速度計資料存放寄存器位置
   Wire.endTransmission(false);
   Wire.requestFrom(MPU, 6, true); // Read 6 registers total, each axis value is stored in 2 registers
   //For a range of +-2g, we need to divide the raw values by 16384, according to the datasheet
